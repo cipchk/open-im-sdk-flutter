@@ -18,22 +18,20 @@ class GroupManager {
   /// Invite users to a group, allowing them to join without approval.
   /// [groupID] Group ID
   /// [userIDList] List of user IDs
-  Future<List<GroupInviteResult>> inviteUserToGroup({
+  Future inviteUserToGroup({
     required String groupID,
     required List<String> userIDList,
     String? reason,
     String? operationID,
   }) =>
-      _channel
-          .invokeMethod(
-              'inviteUserToGroup',
-              _buildParam({
-                'groupID': groupID,
-                'userIDList': userIDList,
-                'reason': reason,
-                "operationID": Utils.checkOperationID(operationID),
-              }))
-          .then((value) => Utils.toList(value, (map) => GroupInviteResult.fromJson(map)));
+      _channel.invokeMethod(
+          'inviteUserToGroup',
+          _buildParam({
+            'groupID': groupID,
+            'userIDList': userIDList,
+            'reason': reason,
+            "operationID": Utils.checkOperationID(operationID),
+          }));
 
   /// Remove group members
   /// [groupID] Group ID
@@ -129,15 +127,17 @@ class GroupManager {
           }))
       .then((value) => Utils.toList(value, (map) => GroupInfo.fromJson(map)));
 
-  Future<List<GroupInfo>> getJoinedGroupListPage({String? operationID, int offset = 0, int count = 40}) => _channel
-      .invokeMethod(
-          'getJoinedGroupListPage',
-          _buildParam({
-            'offset': offset,
-            'count': count,
-            'operationID': Utils.checkOperationID(operationID),
-          }))
-      .then((value) => Utils.toList(value, (map) => GroupInfo.fromJson(map)));
+  Future<List<GroupInfo>> getJoinedGroupListPage(
+          {String? operationID, int offset = 0, int count = 40}) =>
+      _channel
+          .invokeMethod(
+              'getJoinedGroupListPage',
+              _buildParam({
+                'offset': offset,
+                'count': count,
+                'operationID': Utils.checkOperationID(operationID),
+              }))
+          .then((value) => Utils.toList(value, (map) => GroupInfo.fromJson(map)));
 
   /// Query the list of joined groups
   Future<List<dynamic>> getJoinedGroupListMap({String? operationID}) => _channel
@@ -216,7 +216,11 @@ class GroupManager {
   /// Apply to join a group, requiring approval from an administrator or the group.
   /// [joinSource] 2: Invited, 3: Searched, 4: Using a QR code
   Future<dynamic> joinGroup(
-          {required String groupID, String? reason, String? operationID, int joinSource = 3, String? ex}) =>
+          {required String groupID,
+          String? reason,
+          String? operationID,
+          int joinSource = 3,
+          String? ex}) =>
       _channel.invokeMethod(
           'joinGroup',
           _buildParam({
@@ -600,6 +604,17 @@ class GroupManager {
             'userIDs': userIDs,
             'operationID': Utils.checkOperationID(operationID),
           }));
+
+  Future<int> getGroupApplicationUnhandledCount(GetGroupApplicationUnhandledCountReq req,
+          {String? operationID}) =>
+      _channel
+          .invokeMethod(
+              'getGroupApplicationUnhandledCount',
+              _buildParam({
+                'req': req.toJson(),
+                'operationID': Utils.checkOperationID(operationID),
+              }))
+          .then((value) => int.parse(value));
 
   static Map _buildParam(Map<String, dynamic> param) {
     param["ManagerName"] = "groupManager";
